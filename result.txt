@@ -1,0 +1,100 @@
+practice1
+(6)select * from Employee where employee_name like '%n%' and salary>6000
+   +----+------------+-----+----------+-----------+--------+
+   | id | name       | age | gender   | companyId | salary |
+   +----+------------+-----+----------+-----------+--------+
+   |  1 | 'xiaohong' |  19 | 'female' |         1 |   7000 |
+   +----+------------+-----+----------+-----------+--------+
+
+practice2
+(1)select e.employee_name FROM Employee e
+   INNER JOIN
+   (select company_id,MAX(salary) salary from
+   Employee GROUP BY company_id  )b
+   on e.salary=b.salary
+   and e.company_id= b.company_id
+   +-------------+
+   |employeesName|
+   +-------------+
+   | 'xiaoming'  |
+   +-------------+
+   |  'xiaohong' |
+   +-------------+
+   |  'xiaozhi'  |
+   +-------------+
+
+
+(2)select c.company_name,d.employee_name from company c INNER JOIN
+    (select e.company_id, e.employee_name FROM Employee e
+    INNER JOIN
+     (select company_id,MAX(salary) salary from Employee GROUP BY company_id  )b
+    on e.salary=b.salary
+    and e.company_id= b.company_id)d
+    on
+     d.company_id= c.company_id
+       +-----------+-------------+
+       |companyName|employeesName|
+       +-----------+-------------+
+       |  'baidu'  | 'xiaoming'  |
+       +-----------+-------------+
+       | 'alibaba' |  'xiaohong' |
+       +-----------+-------------+
+       | 'tengxun' |  'xiaozhi'  |
+       +-----------+-------------+
+
+practice3
+(1)select c.* from company c,
+   (select e.company_id, avg(e.salary) salary from Employee e GROUP BY e.company_id)a,
+   (select MAX(b.salary) salary from (
+   select e.company_id, avg(e.salary) salary from Employee e GROUP BY e.company_id
+   )b)d
+   where a.salary=d.salary
+   and c.company_id=a.company_id
+          +---------+-----------+---------------+
+          |companyId|companyName|employeesNumber|
+          +---------+-----------+---------------+
+          |   2     | 'tengxun' |      3000     |
+          +---------+-----------+---------------+
+
+(2)select c.company_name,a.salary avgSalary from company c,
+   (select e.company_id, avg(e.salary) salary from Employee e GROUP BY e.company_id)a
+   where c.company_id=a.company_id
+          +-----------+---------+
+          |companyName|avgSalary|
+          +-----------+---------+
+          |  'baidu'  |   5000  |
+          +-----------+---------+
+          | 'alibaba' |   6500  |
+          +-----------+---------+
+          | 'tengxun' |   8000  |
+          +-----------+---------+
+
+practice4
+(1)select e1.employee_name from Employee e1,
+      (select e.company_id, avg(e.salary) salary from Employee e GROUP BY e.company_id)a
+   where e1.company_id=a.company_id
+   and e1.salary>a.salary
+   +-------------+
+   |employeesName|
+   +-------------+
+   | 'xiaoming'  |
+   +-------------+
+   |  'xiaohong' |
+   +-------------+
+(2)select e.employee_id id,e.employee_name name,e.age,e.gender,c.company_id companyId, c.company_name companyName,a.salary avgsal from company c,employee e,
+      (select e.company_id, avg(e.salary) salary from Employee e GROUP BY e.company_id)a
+      where c.company_id=a.company_id
+   and c.company_id=e.company_id
+   +----+------------+-----+----------+-----------+-----------+--------+
+   | id | name       | age | gender   | companyId |companyName| salary |
+   +----+------------+-----+----------+-----------+-----------+--------+
+   |  0 | 'xiaoming' |  20 |  'male'  |     0     |  'baidu'  |  5000  |
+   +----+------------+-----+----------+-----------+-----------+--------+
+   |  1 | 'xiaohong' |  19 | 'female' |     1     | 'alibaba' |  6500  |
+   +----+------------+-----+----------+-----------+-----------+--------+
+   |  2 | 'xiaozhi'  |  15 |  'male'  |     2     | 'tengxun' |  8000  |
+   +----+------------+-----+----------+-----------+-----------+--------+
+   |  3 | 'xiaogang' |  16 |  'male'  |     1     | 'alibaba' |  6500  |
+   +----+------------+-----+----------+-----------+-----------+--------+
+   |  4 | 'xiaoxia'  |  15 | 'female' |     0     |  'baidu'  |  5000  |
+   +----+------------+-----+----------+-----------+-----------+--------+
